@@ -32,7 +32,7 @@ window.onload = function () {
 
 	var game = new Game(320, 320);
 	game.fps = 24;
-	game.preload('images/clear.png', 'images/chara1.gif', 'images/map2.gif', 'images/icon0.png','sounds/jump.wav', 'sounds/gameover.wav', 'sounds/get.wav', 'sounds/clear.wav');
+	game.preload('images/clear.png', 'images/chara1.gif', 'images/map1.gif', 'images/icon0.png','sounds/jump.wav', 'sounds/gameover.wav', 'sounds/get.wav', 'sounds/clear.wav');
 	game.onload = function() {
 		//var blocks = [
 		//	[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, 1, 1, 1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
