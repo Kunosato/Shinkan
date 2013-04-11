@@ -101,6 +101,7 @@ window.onload = function () {
 					var boundary, crossing;
 					var dx = dest.x - this.x - 5;
 					var dy = dest.y - this.y - 2;
+                    //right collision
 					if (dx > 0 && Math.floor(dest.right / 16) != Math.floor((dest.right - dx) / 16)) {
 						boundary = Math.floor(dest.right / 16) * 16;
 						crossing = (dest.right - boundary) / dx * dy + dest.y;
@@ -110,6 +111,7 @@ window.onload = function () {
 							dest.x = boundary - dest.width - 0.01;
 							continue;
 						}
+						//left collision
 					} else if (dx < 0 && Math.floor(dest.x / 16) != Math.floor((dest.x - dx) / 16)) {
 						boundary = Math.floor(dest.x / 16) * 16 + 16;
 						crossing = (boundary - dest.x) / dx * dy + dest.y;
@@ -120,6 +122,7 @@ window.onload = function () {
 							continue;
 						}
 					}
+					//downward collision
 					if (dy > 0 && Math.floor(dest.bottom / 16) != Math.floor((dest.bottom - dy) / 16)) {
 						boundary = Math.floor(dest.bottom / 16) * 16;
 						crossing = (dest.bottom - boundary) / dy * dx + dest.x;
@@ -133,6 +136,7 @@ window.onload = function () {
 							dest.y = boundary - dest.height - 0.01;
 							continue;
 						}
+						//upward collision
 					} else if (dy < 0 && Math.floor(dest.y / 16) != Math.floor((dest.y - dy) / 16)) {
 						boundary = Math.floor(dest.y / 16) * 16 + 16;
 						crossing = (boundary - dest.y) / dy * dx + dest.x;
