@@ -32,7 +32,7 @@ window.onload = function () {
 
 	var game = new Game(320, 320);
 	game.fps = 24;
-	game.preload('images/clear.png', 'images/chara1.gif', 'images/map1.gif', 'images/icon0.png', 'sounds/jump.wav', 'sounds/gameover.wav', 'sounds/get.wav', 'sounds/clear.wav');
+	game.preload('images/clear.png', 'images/chara1.gif', 'images/map1.gif', 'sounds/jump.wav', 'sounds/gameover.wav', 'sounds/get.wav', 'sounds/clear.wav');
 	game.onload = function () {
 
 		var map = Mapset(game);
@@ -201,11 +201,11 @@ window.onload = function () {
 		********************/
 		var items = new Array();
 		for (var y in mapData) {
-			var x = mapData[y].indexOf(20);
+			var x = mapData[y].indexOf(Item.FRAME);
 			while (x != -1) {
 				items.push(new Item(x, y));
 				mapData[y][x] = -1;
-				x = mapData[y].indexOf(20, x + 1);
+				x = mapData[y].indexOf(Item.FRAME, x + 1);
 			}
 			map.loadData(mapData);
 		}
@@ -285,14 +285,15 @@ window.onload = function () {
 		initialize: function (x, y) {
 			enchant.Sprite.call(this, 16, 16);
 
-			this.image = game.assets['images/icon0.png'];
+			this.image = game.assets['images/map1.gif'];
 			this.x = x * 16;
 			this.y = y * 16;
-			this.frame = 14;
+			this.frame = Item.FRAME;
 			this.score = 10;
 			this.isExist = true;
 		}
 	});
+	Item["FRAME"] = 20;
 
 	/********************
 	*  Goal Class
