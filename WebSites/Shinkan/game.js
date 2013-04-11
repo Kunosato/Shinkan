@@ -125,6 +125,9 @@ window.onload = function () {
 						crossing = (dest.bottom - boundary) / dy * dx + dest.x;
 						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
 							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
+							if (map.checkTile(crossing, boundary) == 17 || map.checkTile(crossing + dest.width, boundary) == 17) {
+								this.alive = false;
+							}
 							this.jumping = false;
 							this.vy = 0;
 							dest.y = boundary - dest.height - 0.01;
