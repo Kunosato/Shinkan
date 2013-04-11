@@ -60,6 +60,9 @@ window.onload = function () {
         map.image = game.assets['images/map2.gif'];
         map.loadData(blocks);
 
+        /********************
+        *  Bear Class
+        ********************/
         Bear = enchant.Class.create(Sprite,{
             initialize:function(x,y){
                 enchant.Sprite.call(this,32,32);
@@ -214,9 +217,22 @@ window.onload = function () {
             }
         });
 
+        /********************
+        *  Item Instance
+        ********************/
         var items = new Array(10);
+        items[0] = new Item(  4,   8);
+        items[1] = new Item( 16,   7);
+        items[2] = new Item( 17,   7);
+        items[3] = new Item( 32,   4);
+        items[4] = new Item( 33,   4);
+        items[5] = new Item( 25,   4);
+        items[6] = new Item( 26,   4);
+        items[7] = new Item(116,   9);
+        items[8] = new Item(120,   9);
+        items[9] = new Item(124,   9);
+
         for (var i = 0; i < items.length ; i++) {
-            items[i] = new Item();
             items[i].addEventListener('enterframe', function (e) {
                 if (this.intersect(bear)) {
                     game.assets['sounds/get.wav'].clone().play();
@@ -225,30 +241,11 @@ window.onload = function () {
                 }
             });
         }
-        items[0].x = 4 * 16;
-        items[0].y = 8 * 16;
-        items[1].x = 16 * 16;
-        items[1].y = 7 * 16;
-        items[2].x = 16 * 17;
-        items[2].y = 7 * 16;
-        items[3].x = 32 * 13;
-        items[3].y = 16 * 4;
-        items[4].x = 32 * 14;
-        items[4].y = 16 * 4;
-        items[5].x = 32 * 25;
-        items[5].y = 16 * 4;
-        items[6].x = 32 * 26;
-        items[6].y = 16 * 4;
-        items[7].x = 116 * 16;
-        items[7].y = 155;
-        items[8].x = 120 * 16;
-        items[8].y = 155;
-        items[9].x = 124 * 16;
-        items[9].y = 155;
 
-        var goal = new Goal();
-        goal.x = 16 * 139;
-        goal.y = 16 * 10;
+        /********************
+        *  Goal Instance
+        ********************/
+        var goal = new Goal(139, 10);
         goal.addEventListener('enterframe', function (e) {
             if (goal.intersect(bear)) {
                 var clear = new Sprite(267, 48);
@@ -261,6 +258,9 @@ window.onload = function () {
             }
         });
 
+        /********************
+        *  Score Instance
+        ********************/
         var score = new Label();
         score.x = 2;
         score.y = 5;
@@ -269,6 +269,9 @@ window.onload = function () {
             score.text = 'Score:' + gameScore;
         });
 
+        /********************
+        *  Stage Instance
+        ********************/
         var stage = new Group();
         stage.addChild(map);
         stage.addChild(bear);
@@ -281,9 +284,15 @@ window.onload = function () {
                 this.x = 64 - bear.x;
             }
         });
+
+        /********************
+        *  Pad Instance
+        ********************/
         var pad = new Pad();
         pad.x = 0;
         pad.y = 224;
+
+        //add child to root scene
         game.rootScene.addChild(stage);
         game.rootScene.addChild(score);
         game.rootScene.addChild(pad);
@@ -291,26 +300,32 @@ window.onload = function () {
     };
     game.start();
 
+    /********************
+    *  Item Class
+    ********************/
     var Item = enchant.Class.create(enchant.Sprite, {
-        initialize: function () {
+        initialize: function (x, y) {
             enchant.Sprite.call(this, 16, 16);
 
             this.image = game.assets['images/icon0.png'];
-            this.x = 0;
-            this.y = 0;
+            this.x = x * 16;
+            this.y = y * 16;
             this.frame = 14;
             this.score = 10;
             
         }
     });
 
+    /********************
+    *  Goal Class
+    ********************/
     var Goal = enchant.Class.create(enchant.Sprite, {
-        initialize: function () {
+        initialize: function (x, y) {
             enchant.Sprite.call(this, 32, 32);
 
             this.image = game.assets['images/chara1.gif'];
-            this.x = 0;
-            this.y = 0;
+            this.x = x * 16;
+            this.y = y * 16;
             this.frame = 10;
             this.scaleX = -1;
             this.score = 20;
