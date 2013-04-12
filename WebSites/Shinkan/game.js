@@ -92,11 +92,18 @@ window.onload = function () {
 					var boundary, crossing;
 					var dx = dest.x - this.x - 5;
 					var dy = dest.y - this.y - 2;
+					// enum Direction もどき
+					var Direction = function() {
+					}
+					Direction.upward = 0;
+					Direction.right = 1;
+					Direction.downward = 2;
+					Direction.left = 3;
 					//right collision
 					if (dx > 0 && Math.floor(dest.right / 16) != Math.floor((dest.right - dx) / 16)) {
 						boundary = Math.floor(dest.right / 16) * 16;
 						crossing = (dest.right - boundary) / dx * dy + dest.y;
-						if(collision("right")){
+						if(collision(Direction.right)){
 							this.vx = 0;
 							dest.x = boundary - dest.width - 0.01;
 							continue;
@@ -105,7 +112,7 @@ window.onload = function () {
 					} else if (dx < 0 && Math.floor(dest.x / 16) != Math.floor((dest.x - dx) / 16)) {
 						boundary = Math.floor(dest.x / 16) * 16 + 16;
 						crossing = (boundary - dest.x) / dx * dy + dest.y;
-						if(collision("left")){
+						if (collision(Direction.left)) {
 							this.vx = 0;
 							dest.x = boundary + 0.01;
 							continue;
@@ -115,7 +122,7 @@ window.onload = function () {
 					if (dy > 0 && Math.floor(dest.bottom / 16) != Math.floor((dest.bottom - dy) / 16)) {
 						boundary = Math.floor(dest.bottom / 16) * 16;
 						crossing = (dest.bottom - boundary) / dy * dx + dest.x;
-						if(collision("downward")){
+						if (collision(Direction.downward)) {
 							this.jumping = false;
 							this.vy = 0;
 							dest.y = boundary - dest.height - 0.01;
@@ -129,7 +136,7 @@ window.onload = function () {
 					} else if (dy < 0 && Math.floor(dest.y / 16) != Math.floor((dest.y - dy) / 16)) {
 						boundary = Math.floor(dest.y / 16) * 16 + 16;
 						crossing = (boundary - dest.y) / dy * dx + dest.x;
-						if(collision("upward")){
+						if (collision(Direction.upward)) {
 							this.vy = 0;
 							dest.y = boundary + 0.01;
 							continue;
@@ -142,22 +149,22 @@ window.onload = function () {
 				this.y = dest.y - 2;
 
 				function collision(direction){
-					if(direction == "right"){
+					if (direction == Direction.right) {
 						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
 							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
 							return true;
 						}
-					} else if(direction == "left"){
+					} else if (direction == Direction.left) {
 						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
 							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
 							return true;
 						}
-					} else if(direction == "downward"){
+					} else if (direction == Direction.downward) {
 						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
 							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
 							return true;
 						}
-					} else if(direction == "upward"){
+					} else if (direction == Direction.upward) {
 						if((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
 							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))){
 							return true;
