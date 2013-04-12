@@ -244,7 +244,6 @@ window.onload = function () {
 		for (var i = 0; i < goals.length ; i++) {
 		    goals[i].addEventListener('enterframe', function (e) {
 		        if (this.intersect(bear)) {
-		            game.assets['sounds/clear.wav'].clone().play();
 		            gameScore += this.score;
 		            var clear = new Sprite(267, 48);
 		            clear.image = game.assets['images/clear.png'];
