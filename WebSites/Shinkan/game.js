@@ -162,25 +162,25 @@ window.onload = function () {
 							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
 							return true;
 						}
-						break;
+						return false;
 					case Direction.left:
 						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
 							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
 							return true;
 						}
-						break;
+						return false;
 					case Direction.downward:
 						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
 							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
 							return true;
-						break;
 						}
+						return false;
 					case Direction.upward:
 						if((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
 							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))){
 							return true;
 						}
-						break;
+						return false;
 					default:
 						return false;
 					}
@@ -200,19 +200,20 @@ window.onload = function () {
 			},
 			dead: function () {
 				game.assets['sounds/gameover.wav'].play();
-				var score = Math.round(bear.x);
 				this.frame = 3;
-				this.vy = -10;
+				this.vy = -3;
+				this.y += this.vy;
 				if (++this.count > 5) {
 					this.dying();
 				}
 			},
 			dying: function () {
+				var score = Math.round(bear.x);
 				this.addEventListener('enterframe', function () {
-					this.vy += 2;
-					this.y += Math.min(Math.max(this.vy, -10), 10);
+					this.vy += 1;
+					this.y += this.vy;
 					if (this.y > 320) {
-						game.end(score, score + 'mで死にました');
+						game.end('ヤラレチャッタ');
 					}
 				});
 				this.removeEventListener('enterframe', arguments.callee);
@@ -226,7 +227,9 @@ window.onload = function () {
 				this.move();
 				this.jump();
 			} else {
-				this.dead();
+				if(this.dying){
+					this.dead();
+				}
 			}
 
 			if (this.y > 320) {
