@@ -90,7 +90,7 @@ window.onload = function () {
 				this.vy = Math.min(Math.max(this.vy, -10), 10);
 				var dest = new Rectangle(
 					this.x + this.vx + 5, this.y + this.vy + 2,
-					this.width - 10, this.height - 2
+					this.width - 16, this.height - 2
 				);
 				this.jumping = true;
 				if (dest.x < -stage.x) {
