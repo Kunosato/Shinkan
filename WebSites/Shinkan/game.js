@@ -155,34 +155,42 @@ window.onload = function () {
 				this.x = dest.x - 5;
 				this.y = dest.y - 2;
 
-				function collision(direction){
-					switch(direction){
-					case Direction.right:
-						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
-							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
-							return true;
-						}
-						return false;
-					case Direction.left:
-						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
-							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
-							return true;
-						}
-						return false;
-					case Direction.downward:
-						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
-							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
-							return true;
-						}
-						return false;
-					case Direction.upward:
-						if((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
-							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))){
-							return true;
-						}
-						return false;
-					default:
-						return false;
+				function collision(direction) {
+					var flags = new Array();
+
+					switch (direction) {
+						case Direction.right:
+							for(i = 0; i < dest.height; ++i){
+								if ((map.hitTest(boundary, crossing + i) && !map.hitTest(boundary - 16, crossing + i))){
+									flags.push(true);
+								}
+							}
+							if(flags.indexOf(true) != -1)
+								return true;
+							else
+								return false;
+						case Direction.left:
+								if((map.hitTest(boundary - 16, crossing + i) && !map.hitTest(boundary, crossing + i))){
+									flags.push(true);
+								}
+							if(flags.indexOf(true) != -1)
+								return true;
+							else
+								return false;
+						case Direction.downward:
+							if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
+								(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
+								return true;
+								break;
+							}
+						case Direction.upward:
+							if ((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
+								(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))) {
+								return true;
+							}
+							break;
+						default:
+							return false;
 					}
 				}
 			},
@@ -337,34 +345,34 @@ window.onload = function () {
 				this.x = dest.x - 5;
 				this.y = dest.y - 2;
 
-				function collision(direction) {
-					switch (direction) {
-						case Direction.right:
-							if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
-								(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
-								return true;
-							}
-							break;
-						case Direction.left:
-							if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
-								(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
-								return true;
-							}
-							break;
-						case Direction.downward:
-							if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
-								(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
-								return true;
-								break;
-							}
-						case Direction.upward:
-							if ((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
-								(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))) {
-								return true;
-							}
-							break;
-						default:
-							return false;
+				function collision(direction){
+					switch(direction){
+					case Direction.right:
+						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
+							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
+							return true;
+						}
+						return false;
+					case Direction.left:
+						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
+							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
+							return true;
+						}
+						return false;
+					case Direction.downward:
+						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
+							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
+							return true;
+						}
+						return false;
+					case Direction.upward:
+						if((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
+							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))){
+							return true;
+						}
+						return false;
+					default:
+						return false;
 					}
 				}
 			},
@@ -556,7 +564,7 @@ window.onload = function () {
 	        this.score = 100;
 	    }
 	});
-	Goal["FRAME"] = 21;
+	Goal.FRAME = 21;
 };
 
 
