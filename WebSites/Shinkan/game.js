@@ -273,29 +273,27 @@ window.onload = function () {
 			//	}
 			//},
 			move: function () {
-				//this.vx += this.ax + this.friction;
-				this.vy += 2; // 2 is gravity
-				this.vx = Math.min(Math.max(this.vx, -10), 10);
-				this.vy = Math.min(Math.max(this.vy, -10), 10);
+				this.vy += 1;
 				var dest = new Rectangle(
 					this.x + this.vx + 5, this.y + this.vy + 2,
 					this.width - 16, this.height - 2
 				);
-				//this.jumping = true;
-				//if (dest.x < -stage.x) {
-				//	dest.x = -stage.x;
-				//	this.vx = 0;
-				//}
 				while (true) {
 					var boundary, crossing;
 					var dx = dest.x - this.x - 5;
 					var dy = dest.y - this.y - 2;
+					// enum Direction もどき
+					var Direction = function () {
+					}
+					Direction.upward = 0;
+					Direction.right = 1;
+					Direction.downward = 2;
+					Direction.left = 3;
 					//right collision
 					if (dx > 0 && Math.floor(dest.right / 16) != Math.floor((dest.right - dx) / 16)) {
 						boundary = Math.floor(dest.right / 16) * 16;
 						crossing = (dest.right - boundary) / dx * dy + dest.y;
-						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
-							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
+						if (collision(Direction.right)) {
 							this.vx = 0;
 							dest.x = boundary - dest.width - 0.01;
 							continue;
@@ -304,8 +302,7 @@ window.onload = function () {
 					} else if (dx < 0 && Math.floor(dest.x / 16) != Math.floor((dest.x - dx) / 16)) {
 						boundary = Math.floor(dest.x / 16) * 16 + 16;
 						crossing = (boundary - dest.x) / dx * dy + dest.y;
-						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
-							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
+						if (collision(Direction.left)) {
 							this.vx = 0;
 							dest.x = boundary + 0.01;
 							continue;
@@ -315,22 +312,20 @@ window.onload = function () {
 					if (dy > 0 && Math.floor(dest.bottom / 16) != Math.floor((dest.bottom - dy) / 16)) {
 						boundary = Math.floor(dest.bottom / 16) * 16;
 						crossing = (dest.bottom - boundary) / dy * dx + dest.x;
-						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
-							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
+						if (collision(Direction.downward)) {
+							this.vy = 0;
+							dest.y = boundary - dest.height - 0.01;
+
 							if (map.checkTile(crossing, boundary) == 17 || map.checkTile(crossing + dest.width, boundary) == 17) {
 								this.alive = false;
 							}
-							this.jumping = false;
-							this.vy = 0;
-							dest.y = boundary - dest.height - 0.01;
 							continue;
 						}
 						//upward collision
 					} else if (dy < 0 && Math.floor(dest.y / 16) != Math.floor((dest.y - dy) / 16)) {
 						boundary = Math.floor(dest.y / 16) * 16 + 16;
 						crossing = (boundary - dest.y) / dy * dx + dest.x;
-						if ((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
-							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))) {
+						if (collision(Direction.upward)) {
 							this.vy = 0;
 							dest.y = boundary + 0.01;
 							continue;
@@ -341,6 +336,37 @@ window.onload = function () {
 				}
 				this.x = dest.x - 5;
 				this.y = dest.y - 2;
+
+				function collision(direction) {
+					switch (direction) {
+						case Direction.right:
+							if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
+								(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
+								return true;
+							}
+							break;
+						case Direction.left:
+							if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
+								(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
+								return true;
+							}
+							break;
+						case Direction.downward:
+							if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
+								(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
+								return true;
+								break;
+							}
+						case Direction.upward:
+							if ((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
+								(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))) {
+								return true;
+							}
+							break;
+						default:
+							return false;
+					}
+				}
 			},
 			//jump: function () {
 			//	if (this.jumping) {
