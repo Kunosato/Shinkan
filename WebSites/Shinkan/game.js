@@ -45,8 +45,6 @@ window.onload = function () {
 				this.y = y * 16;
 				this.vx = 0;
 				this.vy = 0;
-				this.jumping = true;
-				this.jumpBoost = 0;
 				this.alive = true;
 				this.count = 0;
 				this.image = game.assets[Path.Sprite.chara1];
@@ -202,7 +200,6 @@ window.onload = function () {
 						game.assets[Path.Audio.jump].play();
 					}
 					this.vy -= this.jumpBoost > 0 ? --this.jumpBoost : 0;
-					this.jumping = true;
 				} else {
 					this.jumpBoost = 0;
 				}
