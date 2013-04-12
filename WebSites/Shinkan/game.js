@@ -147,27 +147,32 @@ window.onload = function () {
 				this.y = dest.y - 2;
 
 				function collision(direction){
-					if (direction == Direction.right) {
+					switch(direction){
+					case Direction.right:
 						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
 							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
 							return true;
 						}
-					} else if (direction == Direction.left) {
+						break;
+					case Direction.left:
 						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
 							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
 							return true;
 						}
-					} else if (direction == Direction.downward) {
+						break;
+					case Direction.downward:
 						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
 							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
 							return true;
+						break;
 						}
-					} else if (direction == Direction.upward) {
+					case Direction.upward:
 						if((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
 							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))){
 							return true;
 						}
-					} else {
+						break;
+					default:
 						return false;
 					}
 				}
