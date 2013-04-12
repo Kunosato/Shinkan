@@ -502,7 +502,7 @@ window.onload = function () {
 			this.isExist = true;
 		}
 	});
-	Item["FRAME"] = 20;
+	Item.FRAME = 20;
 
 	/********************
 	*  Goal Class
