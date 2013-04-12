@@ -101,7 +101,7 @@ window.onload = function () {
 					var boundary, crossing;
 					var dx = dest.x - this.x - 5;
 					var dy = dest.y - this.y - 2;
-                    //right collision
+          //right collision
 					if (dx > 0 && Math.floor(dest.right / 16) != Math.floor((dest.right - dx) / 16)) {
 						boundary = Math.floor(dest.right / 16) * 16;
 						crossing = (dest.right - boundary) / dx * dy + dest.y;
@@ -111,7 +111,7 @@ window.onload = function () {
 							dest.x = boundary - dest.width - 0.01;
 							continue;
 						}
-						//left collision
+					//left collision
 					} else if (dx < 0 && Math.floor(dest.x / 16) != Math.floor((dest.x - dx) / 16)) {
 						boundary = Math.floor(dest.x / 16) * 16 + 16;
 						crossing = (boundary - dest.x) / dx * dy + dest.y;
@@ -136,7 +136,7 @@ window.onload = function () {
 							dest.y = boundary - dest.height - 0.01;
 							continue;
 						}
-						//upward collision
+					//upward collision
 					} else if (dy < 0 && Math.floor(dest.y / 16) != Math.floor((dest.y - dy) / 16)) {
 						boundary = Math.floor(dest.y / 16) * 16 + 16;
 						crossing = (boundary - dest.y) / dy * dx + dest.x;
@@ -204,6 +204,161 @@ window.onload = function () {
 		});
 
 		/********************
+	*  Monster Class
+	********************/
+		var Monster = Class.create(Sprite, {
+			initialize: function (x, y) {
+				enchant.Sprite.call(this, 32, 32);
+				this.x = x * 16;
+				this.y = y * 16;
+				this.vx = 0;
+				this.vy = 0;
+				//this.ax = 0;
+				//this.ay = 0;
+				//this.friction = 0;
+				//this.jumping = true;
+				//this.jumpBoost = 0;
+				this.alive = true;
+				this.count = 0;
+				this.image = game.assets['images/chara1.gif'];
+				this.frame = 5;
+			},
+			setMoveDirection: function () {
+				if (true) {
+					this.vx = -1.0;
+					this.scaleX = -1;
+				} else if (game.input.right) {
+					this.ax = 0.5;
+					this.scaleX = 1;
+				} else {
+					this.ax = 0;
+				}
+
+				//if (this.vx != 0) {
+				//	if ((game.frame - 5) % 3 == 0) {
+				//		this.frame %= 2;
+				//		++this.frame;
+				//	}
+				//} else {
+				//	this.frame = 0;
+				//}
+			},
+			//calcFriction: function () {
+			//	if (this.vx >= 0) {
+			//		this.friction = this.vx > 0.3 ? -0.3 : -this.vx;
+			//	} else {
+			//		this.friction = this.vx < -0.3 ? 0.3 : -this.vx;
+			//	}
+			//},
+			move: function () {
+				//this.vx += this.ax + this.friction;
+				this.vy += 2; // 2 is gravity
+				//this.vx = Math.min(Math.max(this.vx, -10), 10);
+				//this.vy = Math.min(Math.max(this.vy, -10), 10);
+				var dest = new Rectangle(
+					this.x + this.vx + 5, this.y + this.vy + 2,
+					this.width - 16, this.height - 2
+				);
+				//this.jumping = true;
+				//if (dest.x < -stage.x) {
+				//	dest.x = -stage.x;
+				//	this.vx = 0;
+				//}
+				while (true) {
+					var boundary, crossing;
+					var dx = dest.x - this.x - 5;
+					var dy = dest.y - this.y - 2;
+					//right collision
+					if (dx > 0 && Math.floor(dest.right / 16) != Math.floor((dest.right - dx) / 16)) {
+						boundary = Math.floor(dest.right / 16) * 16;
+						crossing = (dest.right - boundary) / dx * dy + dest.y;
+						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
+							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
+							this.vx = 0;
+							dest.x = boundary - dest.width - 0.01;
+							continue;
+						}
+						//left collision
+					} else if (dx < 0 && Math.floor(dest.x / 16) != Math.floor((dest.x - dx) / 16)) {
+						boundary = Math.floor(dest.x / 16) * 16 + 16;
+						crossing = (boundary - dest.x) / dx * dy + dest.y;
+						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
+							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
+							this.vx = 0;
+							dest.x = boundary + 0.01;
+							continue;
+						}
+					}
+					//downward collision
+					if (dy > 0 && Math.floor(dest.bottom / 16) != Math.floor((dest.bottom - dy) / 16)) {
+						boundary = Math.floor(dest.bottom / 16) * 16;
+						crossing = (dest.bottom - boundary) / dy * dx + dest.x;
+						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
+							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
+							if (map.checkTile(crossing, boundary) == 17 || map.checkTile(crossing + dest.width, boundary) == 17) {
+								this.alive = false;
+							}
+							//this.jumping = false;
+							this.vy = 0;
+							dest.y = boundary - dest.height - 0.01;
+							continue;
+						}
+						//upward collision
+					} else if (dy < 0 && Math.floor(dest.y / 16) != Math.floor((dest.y - dy) / 16)) {
+						boundary = Math.floor(dest.y / 16) * 16 + 16;
+						crossing = (boundary - dest.y) / dy * dx + dest.x;
+						if ((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
+							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))) {
+							this.vy = 0;
+							dest.y = boundary + 0.01;
+							continue;
+						}
+					}
+
+					break;
+				}
+				this.x = dest.x - 5;
+				this.y = dest.y - 2;
+			},
+			//jump: function () {
+			//	if (this.jumping) {
+			//		if (!game.input.up || --this.jumpBoost < 0) {
+			//			this.ay = 0;
+			//		}
+			//	} else {
+			//		if (game.input.up) {
+			//			this.jumpBoost = 5;
+			//			this.ay = -5;
+			//			game.assets['sounds/jump.wav'].play();
+			//		}
+			//	}
+			//},
+			dead: function () {
+				game.assets['sounds/gameover.wav'].play();
+				var score = Math.round(this.x);
+				this.frame = 8;
+				this.vy = -10;
+				if (++this.count > 5) {
+					this.parentNode.removeChild(this);
+				}
+			}
+		});
+		var monster = new Monster(8, -1);
+
+		monster.addEventListener('enterframe', function (e) {
+			if (this.alive) {
+				this.setMoveDirection();
+				this.move();
+			} else {
+				this.dead();
+			}
+
+			if (this.y > 320) {
+				this.alive = false;
+			}
+		});
+
+		/********************
 		*  Item Instance
 		********************/
 		var items = new Array();
@@ -260,6 +415,7 @@ window.onload = function () {
 		var stage = new Group();
 		stage.addChild(map);
 		stage.addChild(bear);
+		stage.addChild(monster);
 		for (var i = 0; i < items.length; i++) {
 			stage.addChild(items[i]);
 		}
