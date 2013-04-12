@@ -1,3 +1,4 @@
+/// <reference path="index.html" />
 /// <reference path="map.js" />
 /// <reference path="libraries/enchant.js" />
 window.onload = function () {
@@ -23,7 +24,13 @@ window.onload = function () {
 
 	var game = new Game(320, 320);
 	game.fps = 24;
-	game.preload('images/clear.png', 'images/chara1.gif', 'images/map1.gif', 'sounds/jump.wav', 'sounds/gameover.wav', 'sounds/get.wav', 'sounds/clear.wav');
+
+	for (var spritePath in Path.Sprite) {
+		game.preload(Path.Sprite[spritePath]);
+	}
+	for (var audioPath in Path.Audio) {
+		game.preload(Path.Audio[audioPath]);
+	}
 	game.onload = function () {
 
 		var map = Mapset(game);
@@ -42,7 +49,7 @@ window.onload = function () {
 				this.jumpBoost = 0;
 				this.alive = true;
 				this.count = 0;
-				this.image = game.assets['images/chara1.gif'];
+				this.image = game.assets[Path.Sprite.chara1];
 			}
 		});
 
@@ -78,6 +85,8 @@ window.onload = function () {
 			},
 			move: function () {
 				this.vy += 1;
+				this.vx = Math.min(Math.max(this.vx, -10), 10);
+				this.vy = Math.min(Math.max(this.vy, -10), 10);
 				var dest = new Rectangle(
 					this.x + this.vx + 5, this.y + this.vy + 2,
 					this.width - 16, this.height - 2
@@ -91,7 +100,7 @@ window.onload = function () {
 					var dx = dest.x - this.x - 5;
 					var dy = dest.y - this.y - 2;
 					// enum Direction もどき
-					var Direction = function() {
+					var Direction = function () {
 					}
 					Direction.upward = 0;
 					Direction.right = 1;
@@ -101,7 +110,7 @@ window.onload = function () {
 					if (dx > 0 && Math.floor(dest.right / 16) != Math.floor((dest.right - dx) / 16)) {
 						boundary = Math.floor(dest.right / 16) * 16;
 						crossing = (dest.right - boundary) / dx * dy + dest.y;
-						if(collision(Direction.right)){
+						if (collision(Direction.right)) {
 							this.vx = 0;
 							dest.x = boundary - dest.width - 0.01;
 							continue;
@@ -151,20 +160,20 @@ window.onload = function () {
 
 					switch (direction) {
 						case Direction.right:
-							for(i = 0; i < dest.height; ++i){
-								if ((map.hitTest(boundary, crossing + i) && !map.hitTest(boundary - 16, crossing + i))){
+							for (i = 0; i < dest.height; ++i) {
+								if ((map.hitTest(boundary, crossing + i) && !map.hitTest(boundary - 16, crossing + i))) {
 									flags.push(true);
 								}
 							}
-							if(flags.indexOf(true) != -1)
+							if (flags.indexOf(true) != -1)
 								return true;
 							else
 								return false;
 						case Direction.left:
-								if((map.hitTest(boundary - 16, crossing + i) && !map.hitTest(boundary, crossing + i))){
-									flags.push(true);
-								}
-							if(flags.indexOf(true) != -1)
+							if ((map.hitTest(boundary - 16, crossing + i) && !map.hitTest(boundary, crossing + i))) {
+								flags.push(true);
+							}
+							if (flags.indexOf(true) != -1)
 								return true;
 							else
 								return false;
@@ -187,9 +196,9 @@ window.onload = function () {
 			},
 			jump: function () {
 				if (game.input.up) {
-					if(!this.jumping){
-						this.jumpBoost = 5;	
-						game.assets['sounds/jump.wav'].play();
+					if (!this.jumping) {
+						this.jumpBoost = 5;
+						game.assets[Path.Audio.jump].play();
 					}
 					this.vy -= this.jumpBoost > 0 ? --this.jumpBoost : 0;
 					this.jumping = true;
@@ -198,11 +207,11 @@ window.onload = function () {
 				}
 			},
 			dead: function () {
-				game.assets['sounds/gameover.wav'].play();
+				game.assets[Path.Audio.gameover].play();
 				this.frame = 3;
 				this.vy = -3;
 				this.y += this.vy;
-				if (++this.count > 5) {
+				if (++this.count > 10) {
 					this.dying();
 				}
 			},
@@ -226,9 +235,7 @@ window.onload = function () {
 				this.move();
 				this.jump();
 			} else {
-				if(this.dying){
-					this.dead();
-				}
+				this.dead();
 			}
 
 			if (this.y > 320) {
@@ -281,6 +288,8 @@ window.onload = function () {
 					var boundary, crossing;
 					var dx = dest.x - this.x - 5;
 					var dy = dest.y - this.y - 2;
+					this.vx = Math.min(Math.max(this.vx, -10), 10);
+					this.vy = Math.min(Math.max(this.vy, -10), 10);
 					// enum Direction もどき
 					var Direction = function () {
 					}
@@ -336,55 +345,41 @@ window.onload = function () {
 				this.x = dest.x - 5;
 				this.y = dest.y - 2;
 
-				function collision(direction){
-					switch(direction){
-					case Direction.right:
-						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
-							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
-							return true;
-						}
-						return false;
-					case Direction.left:
-						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
-							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
-							return true;
-						}
-						return false;
-					case Direction.downward:
-						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
-							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
-							return true;
-						}
-						return false;
-					case Direction.upward:
-						if((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
-							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))){
-							return true;
-						}
-						return false;
-					default:
-						return false;
+				function collision(direction) {
+					switch (direction) {
+						case Direction.right:
+							if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
+								(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
+								return true;
+							}
+							return false;
+						case Direction.left:
+							if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
+								(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
+								return true;
+							}
+							return false;
+						case Direction.downward:
+							if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
+								(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
+								return true;
+							}
+							return false;
+						case Direction.upward:
+							if ((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
+								(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))) {
+								return true;
+							}
+							return false;
+						default:
+							return false;
 					}
 				}
 			},
-			//jump: function () {
-			//	if (this.jumping) {
-			//		if (!game.input.up || --this.jumpBoost < 0) {
-			//			this.ay = 0;
-			//		}
-			//	} else {
-			//		if (game.input.up) {
-			//			this.jumpBoost = 5;
-			//			this.ay = -5;
-			//			game.assets['sounds/jump.wav'].play();
-			//		}
-			//	}
-			//},
 			dead: function () {
-				game.assets['sounds/gameover.wav'].play();
+				game.assets[Path.Audio.gameover].play();
 				var score = Math.round(this.x);
 				this.frame = 8;
-				this.vy = -10;
 				if (++this.count > 5) {
 					this.parentNode.removeChild(this);
 				}
@@ -412,7 +407,7 @@ window.onload = function () {
 				}
 
 				if (this.intersect(bear)) {
-				//	bear.alive = false;
+					//	bear.alive = false;
 				}
 
 				if (this.y > 320) {
@@ -421,7 +416,7 @@ window.onload = function () {
 			});
 		}
 
-		
+
 
 		/********************
 		*  Item Instance
@@ -440,7 +435,7 @@ window.onload = function () {
 		for (var i = 0; i < items.length ; i++) {
 			items[i].addEventListener('enterframe', function (e) {
 				if (this.intersect(bear) && bear.alive) {
-					game.assets['sounds/get.wav'].clone().play();
+					game.assets[Path.Audio.get].clone().play();
 					gameScore += this.score;
 					this.parentNode.removeChild(this);
 				}
@@ -452,28 +447,28 @@ window.onload = function () {
 		********************/
 		var goals = new Array();
 		for (var y in mapData) {
-		    var x = mapData[y].indexOf(Goal.FRAME);
-		    while (x != -1) {
-		        goals.push(new Goal(x, y));
-		        mapData[y][x] = -1;
-		        x = mapData[y].indexOf(Goal.FRAME, x + 1);
-		    }
-		    map.loadData(mapData);
+			var x = mapData[y].indexOf(Goal.FRAME);
+			while (x != -1) {
+				goals.push(new Goal(x, y));
+				mapData[y][x] = -1;
+				x = mapData[y].indexOf(Goal.FRAME, x + 1);
+			}
+			map.loadData(mapData);
 		}
 
 		for (var i = 0; i < goals.length ; i++) {
-		    goals[i].addEventListener('enterframe', function (e) {
-		        if (this.intersect(bear) && bear.alive) {
-		            gameScore += this.score;
-		            var clear = new Sprite(267, 48);
-		            clear.image = game.assets['images/clear.png'];
-		            clear.x = game.width / 2 - 133;
-		            clear.y = game.height / 2 - 24;
-		            game.rootScene.addChild(clear);
-		            game.assets['sounds/clear.wav'].play();
-		            game.rootScene.removeChild(stage);
-		        }
-		    });
+			goals[i].addEventListener('enterframe', function (e) {
+				if (this.intersect(bear) && bear.alive) {
+					gameScore += this.score;
+					var clear = new Sprite(267, 48);
+					clear.image = game.assets[Path.Sprite.clear];
+					clear.x = game.width / 2 - 133;
+					clear.y = game.height / 2 - 24;
+					game.rootScene.addChild(clear);
+					game.assets[Path.Audio.clear].play();
+					game.rootScene.removeChild(stage);
+				}
+			});
 		}
 
 		/********************
@@ -500,7 +495,7 @@ window.onload = function () {
 			stage.addChild(items[i]);
 		}
 		for (var i = 0; i < goals.length; i++) {
-		    stage.addChild(goals[i]);
+			stage.addChild(goals[i]);
 		}
 		stage.addEventListener('enterframe', function (e) {
 			if (this.x > 64 - bear.x) {
@@ -530,7 +525,7 @@ window.onload = function () {
 		initialize: function (x, y) {
 			enchant.Sprite.call(this, 16, 16);
 
-			this.image = game.assets['images/map1.gif'];
+			this.image = game.assets[Path.Sprite.map1];
 			this.x = x * 16;
 			this.y = y * 16;
 			this.frame = Item.FRAME;
@@ -544,16 +539,16 @@ window.onload = function () {
 	*  Goal Class
 	********************/
 	var Goal = enchant.Class.create(enchant.Sprite, {
-	    initialize: function (x, y) {
-	        enchant.Sprite.call(this, 16, 16);
+		initialize: function (x, y) {
+			enchant.Sprite.call(this, 16, 16);
 
-	        this.image = game.assets['images/map1.gif'];
-	        this.x = x * 16;
-	        this.y = y * 16;
-	        this.frame = Goal.FRAME;
-	        this.scaleX = -1;
-	        this.score = 100;
-	    }
+			this.image = game.assets[Path.Sprite.map1];
+			this.x = x * 16;
+			this.y = y * 16;
+			this.frame = Goal.FRAME;
+			this.scaleX = -1;
+			this.score = 100;
+		}
 	});
 	Goal.FRAME = 21;
 };
