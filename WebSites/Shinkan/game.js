@@ -1,14 +1,5 @@
 /// <reference path="map.js" />
 /// <reference path="libraries/enchant.js" />
-enchant();
-
-enchant.Sound.enabledInMobileSafari = true;
-
-if (location.protocol == 'file:') {
-	enchant.ENV.USE_WEBAUDIO = false;
-	console.log('1');
-}
-
 window.onload = function () {
 	var gameScore = 0;
 	var Rectangle = enchant.Class.create({
