@@ -385,18 +385,31 @@ window.onload = function () {
 		/********************
 		*  Goal Instance
 		********************/
-		var goal = new Goal(139, 10);
-		goal.addEventListener('enterframe', function (e) {
-			if (goal.intersect(bear)) {
-				var clear = new Sprite(267, 48);
-				clear.image = game.assets['images/clear.png'];
-				clear.x = game.width / 2 - 133;
-				clear.y = game.height / 2 - 24;
-				game.rootScene.addChild(clear);
-				game.assets['sounds/clear.wav'].play();
-				game.rootScene.removeChild(stage);
-			}
-		});
+		var goals = new Array();
+		for (var y in mapData) {
+		    var x = mapData[y].indexOf(Goal.FRAME);
+		    while (x != -1) {
+		        goals.push(new Goal(x, y));
+		        mapData[y][x] = -1;
+		        x = mapData[y].indexOf(Goal.FRAME, x + 1);
+		    }
+		    map.loadData(mapData);
+		}
+
+		for (var i = 0; i < goals.length ; i++) {
+		    goals[i].addEventListener('enterframe', function (e) {
+		        if (this.intersect(bear)) {
+		            gameScore += this.score;
+		            var clear = new Sprite(267, 48);
+		            clear.image = game.assets['images/clear.png'];
+		            clear.x = game.width / 2 - 133;
+		            clear.y = game.height / 2 - 24;
+		            game.rootScene.addChild(clear);
+		            game.assets['sounds/clear.wav'].play();
+		            game.rootScene.removeChild(stage);
+		        }
+		    });
+		}
 
 		/********************
 		*  Score Instance
@@ -419,7 +432,9 @@ window.onload = function () {
 		for (var i = 0; i < items.length; i++) {
 			stage.addChild(items[i]);
 		}
-		stage.addChild(goal);
+		for (var i = 0; i < goals.length; i++) {
+		    stage.addChild(goals[i]);
+		}
 		stage.addEventListener('enterframe', function (e) {
 			if (this.x > 64 - bear.x) {
 				this.x = 64 - bear.x;
@@ -462,17 +477,18 @@ window.onload = function () {
 	*  Goal Class
 	********************/
 	var Goal = enchant.Class.create(enchant.Sprite, {
-		initialize: function (x, y) {
-			enchant.Sprite.call(this, 32, 32);
+	    initialize: function (x, y) {
+	        enchant.Sprite.call(this, 16, 16);
 
-			this.image = game.assets['images/chara1.gif'];
-			this.x = x * 16;
-			this.y = y * 16;
-			this.frame = 10;
-			this.scaleX = -1;
-			this.score = 20;
-		}
+	        this.image = game.assets['images/map1.gif'];
+	        this.x = x * 16;
+	        this.y = y * 16;
+	        this.frame = Goal.FRAME;
+	        this.scaleX = -1;
+	        this.score = 100;
+	    }
 	});
+	Goal["FRAME"] = 21;
 };
 
 
