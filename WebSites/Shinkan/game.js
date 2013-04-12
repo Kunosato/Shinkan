@@ -254,8 +254,8 @@ window.onload = function () {
 			move: function () {
 				//this.vx += this.ax + this.friction;
 				this.vy += 2; // 2 is gravity
-				//this.vx = Math.min(Math.max(this.vx, -10), 10);
-				//this.vy = Math.min(Math.max(this.vy, -10), 10);
+				this.vx = Math.min(Math.max(this.vx, -10), 10);
+				this.vy = Math.min(Math.max(this.vy, -10), 10);
 				var dest = new Rectangle(
 					this.x + this.vx + 5, this.y + this.vy + 2,
 					this.width - 16, this.height - 2
