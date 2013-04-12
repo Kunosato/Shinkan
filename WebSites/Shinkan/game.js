@@ -84,6 +84,7 @@ window.onload = function () {
 				}
 			},
 			move: function () {
+				this.jumping  = true;
 				this.vy += 1;
 				this.vx = Math.min(Math.max(this.vx, -10), 10);
 				this.vy = Math.min(Math.max(this.vy, -10), 10);
