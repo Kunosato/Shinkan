@@ -58,16 +58,16 @@ window.onload = function () {
 			},
 			setMoveDirection: function () {
 				if (game.input.left) {
-					this.ax = -0.5;
+					this.vx = -5;
 					this.scaleX = -1;
 				} else if (game.input.right) {
-					this.ax = 0.5;
+					this.vx = 5;
 					this.scaleX = 1;
 				} else {
-					this.ax = 0;
+					this.vx = 0;
 				}
 
-				if (this.ax != 0) {
+				if (this.vx != 0) {
 					if (game.frame % 3 == 0) {
 						this.frame %= 2;
 						++this.frame;
@@ -77,17 +77,9 @@ window.onload = function () {
 				}
 			},
 			calcFriction: function () {
-				if (this.vx >= 0) {
-					this.friction = this.vx > 0.3 ? -0.3 : -this.vx;
-				} else {
-					this.friction = this.vx < -0.3 ? 0.3 : -this.vx;
-				}
 			},
 			move: function () {
-				this.vx += this.ax + this.friction;
-				this.vy += this.ay + 2; // 2 is gravity
-				this.vx = Math.min(Math.max(this.vx, -10), 10);
-				this.vy = Math.min(Math.max(this.vy, -10), 10);
+				this.vy += 1;
 				var dest = new Rectangle(
 					this.x + this.vx + 5, this.y + this.vy + 2,
 					this.width - 16, this.height - 2
@@ -104,18 +96,16 @@ window.onload = function () {
 					if (dx > 0 && Math.floor(dest.right / 16) != Math.floor((dest.right - dx) / 16)) {
 						boundary = Math.floor(dest.right / 16) * 16;
 						crossing = (dest.right - boundary) / dx * dy + dest.y;
-						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
-							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
+						if(collision("right")){
 							this.vx = 0;
 							dest.x = boundary - dest.width - 0.01;
 							continue;
 						}
-					//left collision
+						//left collision
 					} else if (dx < 0 && Math.floor(dest.x / 16) != Math.floor((dest.x - dx) / 16)) {
 						boundary = Math.floor(dest.x / 16) * 16 + 16;
 						crossing = (boundary - dest.x) / dx * dy + dest.y;
-						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
-							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
+						if(collision("left")){
 							this.vx = 0;
 							dest.x = boundary + 0.01;
 							continue;
@@ -125,23 +115,21 @@ window.onload = function () {
 					if (dy > 0 && Math.floor(dest.bottom / 16) != Math.floor((dest.bottom - dy) / 16)) {
 						boundary = Math.floor(dest.bottom / 16) * 16;
 						crossing = (dest.bottom - boundary) / dy * dx + dest.x;
-						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
-							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
-							if (map.checkTile(crossing, boundary) == 17 || map.checkTile(crossing + dest.width, boundary) == 17) {
-								this.alive = false;
-							}
+						if(collision("downward")){
 							this.jumping = false;
 							this.vy = 0;
 							dest.y = boundary - dest.height - 0.01;
+
+							if (map.checkTile(crossing, boundary) == 17 || map.checkTile(crossing + dest.width, boundary) == 17) {
+								this.alive = false;
+							}
 							continue;
 						}
-					//upward collision
+						//upward collision
 					} else if (dy < 0 && Math.floor(dest.y / 16) != Math.floor((dest.y - dy) / 16)) {
 						boundary = Math.floor(dest.y / 16) * 16 + 16;
 						crossing = (boundary - dest.y) / dy * dx + dest.x;
-						if ((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
-							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))) {
-							this.ay = 0;
+						if(collision("upward")){
 							this.vy = 0;
 							dest.y = boundary + 0.01;
 							continue;
@@ -152,17 +140,39 @@ window.onload = function () {
 				}
 				this.x = dest.x - 5;
 				this.y = dest.y - 2;
+
+				function collision(direction){
+					if(direction == "right"){
+						if ((map.hitTest(boundary, crossing) && !map.hitTest(boundary - 16, crossing)) ||
+							(map.hitTest(boundary, crossing + dest.height) && !map.hitTest(boundary - 16, crossing + dest.height))) {
+							return true;
+						}
+					} else if(direction == "left"){
+						if ((map.hitTest(boundary - 16, crossing) && !map.hitTest(boundary, crossing)) ||
+							(map.hitTest(boundary - 16, crossing + dest.height) && !map.hitTest(boundary, crossing + dest.height))) {
+							return true;
+						}
+					} else if(direction == "downward"){
+						if ((map.hitTest(crossing, boundary) && !map.hitTest(crossing, boundary - 16)) ||
+							(map.hitTest(crossing + dest.width, boundary) && !map.hitTest(crossing + dest.width, boundary - 16))) {
+							return true;
+						}
+					} else if(direction == "upward"){
+						if((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
+							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))){
+							return true;
+						}
+					} else {
+						return false;
+					}
+				}
 			},
 			jump: function () {
-				if (this.jumping) {
-					if (!game.input.up || --this.jumpBoost < 0) {
-						this.ay = 0;
-					}
-				} else {
+				if (!this.jumping) {
 					if (game.input.up) {
 						this.jumping = true;
 						this.jumpBoost = 5;
-						this.ay = -5;
+						this.vy = -10;
 						game.assets['sounds/jump.wav'].play();
 					}
 				}
@@ -299,7 +309,7 @@ window.onload = function () {
 							if (map.checkTile(crossing, boundary) == 17 || map.checkTile(crossing + dest.width, boundary) == 17) {
 								this.alive = false;
 							}
-							//this.jumping = false;
+							this.jumping = false;
 							this.vy = 0;
 							dest.y = boundary - dest.height - 0.01;
 							continue;
@@ -366,7 +376,7 @@ window.onload = function () {
 				}
 
 				if (this.intersect(bear)) {
-					bear.alive = false;
+				//	bear.alive = false;
 				}
 
 				if (this.y > 320) {
