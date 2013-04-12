@@ -92,7 +92,6 @@ window.onload = function () {
 					this.x + this.vx + 5, this.y + this.vy + 2,
 					this.width - 16, this.height - 2
 				);
-				this.jumping = true;
 				if (dest.x < -stage.x) {
 					dest.x = -stage.x;
 					this.vx = 0;
@@ -101,7 +100,7 @@ window.onload = function () {
 					var boundary, crossing;
 					var dx = dest.x - this.x - 5;
 					var dy = dest.y - this.y - 2;
-          //right collision
+					//right collision
 					if (dx > 0 && Math.floor(dest.right / 16) != Math.floor((dest.right - dx) / 16)) {
 						boundary = Math.floor(dest.right / 16) * 16;
 						crossing = (dest.right - boundary) / dx * dy + dest.y;
@@ -142,6 +141,7 @@ window.onload = function () {
 						crossing = (boundary - dest.y) / dy * dx + dest.x;
 						if ((map.hitTest(crossing, boundary - 16) && !map.hitTest(crossing, boundary)) ||
 							(map.hitTest(crossing + dest.width, boundary - 16) && !map.hitTest(crossing + dest.width, boundary))) {
+							this.ay = 0;
 							this.vy = 0;
 							dest.y = boundary + 0.01;
 							continue;
@@ -160,6 +160,7 @@ window.onload = function () {
 					}
 				} else {
 					if (game.input.up) {
+						this.jumping = true;
 						this.jumpBoost = 5;
 						this.ay = -5;
 						game.assets['sounds/jump.wav'].play();
@@ -204,8 +205,8 @@ window.onload = function () {
 		});
 
 		/********************
-	*  Monster Class
-	********************/
+		*  Monster Class
+		********************/
 		var Monster = Class.create(Sprite, {
 			initialize: function (x, y) {
 				enchant.Sprite.call(this, 32, 32);
@@ -392,7 +393,7 @@ window.onload = function () {
 
 		for (var i = 0; i < items.length ; i++) {
 			items[i].addEventListener('enterframe', function (e) {
-				if (this.intersect(bear)) {
+				if (this.intersect(bear) && bear.alive) {
 					game.assets['sounds/get.wav'].clone().play();
 					gameScore += this.score;
 					this.parentNode.removeChild(this);
@@ -416,7 +417,7 @@ window.onload = function () {
 
 		for (var i = 0; i < goals.length ; i++) {
 		    goals[i].addEventListener('enterframe', function (e) {
-		        if (this.intersect(bear)) {
+		        if (this.intersect(bear) && bear.alive) {
 		            gameScore += this.score;
 		            var clear = new Sprite(267, 48);
 		            clear.image = game.assets['images/clear.png'];
