@@ -38,23 +38,32 @@ window.onload = function () {
 		var map = Mapset(game);
 
 		/********************
-		*  Bear Class
+		*  Character Class
 		********************/
-		Bear = enchant.Class.create(Sprite, {
+		Character = enchant.Class.create(Sprite, {
 			initialize: function (x, y) {
 				enchant.Sprite.call(this, 32, 32);
-				this.x = x;
-				this.y = y;
+				this.x = x * 16;
+				this.y = y * 16;
 				this.vx = 0;
 				this.vy = 0;
-				this.ax = 0;
-				this.ay = 0;
-				this.friction = 0;
 				this.jumping = true;
 				this.jumpBoost = 0;
 				this.alive = true;
 				this.count = 0;
 				this.image = game.assets['images/chara1.gif'];
+			}
+		});
+
+
+		/********************
+		*  Bear Class
+		********************/
+		Bear = Class.create(Character, {
+			initialize: function (x, y) {
+				Character.call(this, x, y);
+				this.jumping = true;
+				this.jumpBoost = 0;
 			},
 			setMoveDirection: function () {
 				if (game.input.left) {
@@ -209,7 +218,7 @@ window.onload = function () {
 				this.removeEventListener('enterframe', arguments.callee);
 			}
 		});
-		var bear = new Bear(8, -32);
+		var bear = new Bear(0, 0);
 
 		bear.addEventListener('enterframe', function (e) {
 			if (this.alive) {
@@ -228,21 +237,9 @@ window.onload = function () {
 		/********************
 		*  Monster Class
 		********************/
-		var Monster = Class.create(Sprite, {
+		var Monster = Class.create(Character, {
 			initialize: function (x, y) {
-				enchant.Sprite.call(this, 32, 32);
-				this.x = x * 16;
-				this.y = y * 16;
-				this.vx = 0;
-				this.vy = 0;
-				//this.ax = 0;
-				//this.ay = 0;
-				//this.friction = 0;
-				//this.jumping = true;
-				//this.jumpBoost = 0;
-				this.alive = true;
-				this.count = 0;
-				this.image = game.assets['images/chara1.gif'];
+				Character.call(this, x, y);
 				this.frame = 5;
 			},
 			setMoveDirection: function () {
