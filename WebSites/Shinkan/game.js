@@ -76,8 +76,6 @@ window.onload = function () {
 					this.frame = 0;
 				}
 			},
-			calcFriction: function () {
-			},
 			move: function () {
 				this.vy += 1;
 				var dest = new Rectangle(
@@ -168,13 +166,15 @@ window.onload = function () {
 				}
 			},
 			jump: function () {
-				if (!this.jumping) {
-					if (game.input.up) {
-						this.jumping = true;
-						this.jumpBoost = 5;
-						this.vy = -10;
+				if (game.input.up) {
+					if(!this.jumping){
+						this.jumpBoost = 5;	
 						game.assets['sounds/jump.wav'].play();
 					}
+					this.vy -= this.jumpBoost > 0 ? --this.jumpBoost : 0;
+					this.jumping = true;
+				} else {
+					this.jumpBoost = 0;
 				}
 			},
 			dead: function () {
@@ -202,7 +202,6 @@ window.onload = function () {
 		bear.addEventListener('enterframe', function (e) {
 			if (this.alive) {
 				this.setMoveDirection();
-				this.calcFriction();
 				this.move();
 				this.jump();
 			} else {
