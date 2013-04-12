@@ -343,20 +343,38 @@ window.onload = function () {
 				}
 			}
 		});
-		var monster = new Monster(8, -1);
-
-		monster.addEventListener('enterframe', function (e) {
-			if (this.alive) {
-				this.setMoveDirection();
-				this.move();
-			} else {
-				this.dead();
+		Monster.FRAME = 22;
+		var monsters = new Array();
+		for (var y in mapData) {
+			var x = mapData[y].indexOf(Monster.FRAME);
+			while (x != -1) {
+				monsters.push(new Monster(x, y));
+				mapData[y][x] = -1;
+				x = mapData[y].indexOf(Monster.FRAME, x + 1);
 			}
+			map.loadData(mapData);
+		}
 
-			if (this.y > 320) {
-				this.alive = false;
-			}
-		});
+		for (var i = 0; i < monsters.length ; i++) {
+			monsters[i].addEventListener('enterframe', function (e) {
+				if (this.alive) {
+					this.setMoveDirection();
+					this.move();
+				} else {
+					this.dead();
+				}
+
+				if (this.intersect(bear)) {
+					bear.alive = false;
+				}
+
+				if (this.y > 320) {
+					this.alive = false;
+				}
+			});
+		}
+
+		
 
 		/********************
 		*  Item Instance
@@ -428,7 +446,9 @@ window.onload = function () {
 		var stage = new Group();
 		stage.addChild(map);
 		stage.addChild(bear);
-		stage.addChild(monster);
+		for (var i = 0; i < monsters.length; i++) {
+			stage.addChild(monsters[i]);
+		}
 		for (var i = 0; i < items.length; i++) {
 			stage.addChild(items[i]);
 		}
